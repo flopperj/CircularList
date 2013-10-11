@@ -1,18 +1,37 @@
+/**
+ * 
+ */
 package circularlist;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-public class CircularListArrayBased<E> implements CircularList<E> {
-	private E[] circularList;
+/**
+ * @author James Arama
+ * 
+ */
+public class CircularListReferenceBased<E> implements CircularList<E> {
+
+	private CircularListLink<E> first;
 	private int circularListSize;
+
+	/**
+	 * Gets index of a link 
+	 * @param {CircularListLink<E>} link
+	 * @return {int} index
+	 */
+	private int indexOf(CircularListLink<E> link) {
+		if (link == null)
+			return -1;
+
+		return link.getIndex();
+	}
 
 	/**
 	 * Default Constructor
 	 */
-	@SuppressWarnings("unchecked")
-	public CircularListArrayBased() {
-		this.circularList = (E[]) new Object[1];
+	public CircularListReferenceBased() {
+		this.first = null;
 		this.circularListSize = 0;
 	}
 
@@ -21,7 +40,7 @@ public class CircularListArrayBased<E> implements CircularList<E> {
 	 * @return {boolean} returns true if the list is empty, otherwise false
 	 */
 	public boolean isEmpty() {
-		return this.circularListSize > 0;
+		return this.first == null;
 	}
 
 	/**
@@ -35,32 +54,21 @@ public class CircularListArrayBased<E> implements CircularList<E> {
 	/**
 	 * Removes all elements from the list.
 	 */
-	@SuppressWarnings("unchecked")
 	public void clear() {
 		this.circularListSize = 0;
-		this.circularList = (E[]) new Object[1];
+		this.first = null;
 	}
-
 
 	/**
 	 * Adds a new item to the end of the list. 
 	 * @param {E} item the new item to add
 	 * @return {boolean} returns true if the list was modified
 	 */
-	@SuppressWarnings("unchecked")
 	public boolean add(E item) {
 
 		if (item == null)
 			return false;
 
-		E[] newCircularList = (E[]) new Object[this.size() + 1];
-
-		for (int i = 0; i < this.size(); i++) {
-			newCircularList[i] = this.get(i);
-		}
-
-		// add new item
-		this.circularList = newCircularList;
 		this.add(this.circularListSize++, item);
 
 		return true;
@@ -74,9 +82,14 @@ public class CircularListArrayBased<E> implements CircularList<E> {
 	 * @throws IndexOutOfBoundsException if index is negative
 	 */
 	public void add(int index, E item) throws IndexOutOfBoundsException {
-		this.circularList[index] = item;
+		
+		if(index < 0)
+			throw new IndexOutOfBoundsException("The index provided is a negative value!");
+		
+		CircularListLink<E> link = new CircularListLink<E>(index, item);
+		link.setNextLink(this.first);
+		this.first = link;
 	}
-
 
 	/**
 	 * Remove and return the item at the given index. 
@@ -84,19 +97,29 @@ public class CircularListArrayBased<E> implements CircularList<E> {
 	 * @return {E} the item that was removed
 	 * @throws IndexOutOfBoundsException if index is negative
 	 */
-	@SuppressWarnings("unchecked")
 	public E remove(int index) throws IndexOutOfBoundsException {
+
+		if (index < 0)
+			throw new IndexOutOfBoundsException("The index provided is a negative value!");
 
 		E itemToRemove = this.get(index);
 
-		E[] newCircularList = (E[]) new Object[this.size() + 1];
-
-		for (int i = 0; i < this.size(); i++) {
-			if (this.get(i) != itemToRemove)
-				newCircularList[i] = this.get(i);
+		// create a new list without the item to remove
+		CircularListReferenceBased<E> circularList = new CircularListReferenceBased<E>();
+		for (E item : this) {
+			if (item != itemToRemove)
+				circularList.add(item);
 		}
 
-		this.circularListSize = this.size() - 1;
+		// clear list
+		this.clear();
+
+		// recreate the list
+		for (E item : circularList)
+			this.add(item);
+
+		// update current size
+		this.circularListSize = circularList.size();
 
 		return itemToRemove;
 
@@ -109,11 +132,21 @@ public class CircularListArrayBased<E> implements CircularList<E> {
 	 * @throws IndexOutOfBoundsException if index is negative or list is empty
 	 */
 	public E get(int index) throws IndexOutOfBoundsException {
-		if (index > this.size() || index < 0 || this.size() == 0)
-			throw new IndexOutOfBoundsException("Index: " + index
-					+ " is out of bounds");
 
-		return this.circularList[index];
+		if ( index < 0 || this.size() == 0)
+			throw new IndexOutOfBoundsException("The index provided is a negative value or the List is empty!");
+
+		int n = indexOf(this.first);
+
+		CircularListLink<E> current = this.first;
+
+		// Keep looping till we hit our index to get the appropriate data
+		while (n > index) {
+			--n;
+			current = current.getNextLink();
+		}
+
+		return current.getData();
 	}
 
 	/**
@@ -123,13 +156,13 @@ public class CircularListArrayBased<E> implements CircularList<E> {
 	 */
 	public Iterator<E> iterator() {
 
-		final CircularListArrayBased<E> circularList = this;
+		final CircularListReferenceBased<E> circularList = this;
 
 		Iterator<E> itr = new Iterator<E>() {
-			
+
 			// the next array index to return
 			private int index = 0;
-			
+
 			@Override
 			public boolean hasNext() {
 				return index < circularList.size();
@@ -152,4 +185,5 @@ public class CircularListArrayBased<E> implements CircularList<E> {
 
 		return itr;
 	}
+
 }
