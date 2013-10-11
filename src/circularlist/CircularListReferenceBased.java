@@ -12,7 +12,14 @@ import java.util.NoSuchElementException;
  */
 public class CircularListReferenceBased<E> implements CircularList<E> {
 
+	/**
+	 * @property {CircularListLink<E>} first		- First element on our circular linked list
+	 */
 	private CircularListLink<E> first;
+	
+	/**
+	 * @property {int} circularListSize 			- Keeps the tally of how many items are in the list
+	 */
 	private int circularListSize;
 
 	/**
@@ -133,7 +140,7 @@ public class CircularListReferenceBased<E> implements CircularList<E> {
 	 */
 	public E get(int index) throws IndexOutOfBoundsException {
 
-		if ( index < 0 || this.size() == 0)
+		if ( index < 0 || this.isEmpty())
 			throw new IndexOutOfBoundsException("The index provided is a negative value or the List is empty!");
 
 		int n = indexOf(this.first);
@@ -178,7 +185,7 @@ public class CircularListReferenceBased<E> implements CircularList<E> {
 
 			@Override
 			public void remove() {
-				throw new UnsupportedOperationException();
+				circularList.remove(index);
 			}
 
 		};

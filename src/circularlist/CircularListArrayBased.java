@@ -4,7 +4,13 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 public class CircularListArrayBased<E> implements CircularList<E> {
+	/**
+	 * @property {E[]} circularList			- Our array container of objects
+	 */
 	private E[] circularList;
+	/**
+	 * @property {int} circularListSize 	- Keeps the tally of how many items are in the list
+	 */
 	private int circularListSize;
 
 	/**
@@ -21,7 +27,7 @@ public class CircularListArrayBased<E> implements CircularList<E> {
 	 * @return {boolean} returns true if the list is empty, otherwise false
 	 */
 	public boolean isEmpty() {
-		return this.circularListSize > 0;
+		return this.circularListSize == 0;
 	}
 
 	/**
@@ -74,6 +80,10 @@ public class CircularListArrayBased<E> implements CircularList<E> {
 	 * @throws IndexOutOfBoundsException if index is negative
 	 */
 	public void add(int index, E item) throws IndexOutOfBoundsException {
+
+		if (index < 0)
+			throw new IndexOutOfBoundsException("The index provided is a negative value!");
+		
 		this.circularList[index] = item;
 	}
 
@@ -87,6 +97,9 @@ public class CircularListArrayBased<E> implements CircularList<E> {
 	@SuppressWarnings("unchecked")
 	public E remove(int index) throws IndexOutOfBoundsException {
 
+		if (index < 0)
+			throw new IndexOutOfBoundsException("The index provided is a negative value!");
+		
 		E itemToRemove = this.get(index);
 
 		E[] newCircularList = (E[]) new Object[this.size() - 1];
@@ -108,9 +121,9 @@ public class CircularListArrayBased<E> implements CircularList<E> {
 	 * @throws IndexOutOfBoundsException if index is negative or list is empty
 	 */
 	public E get(int index) throws IndexOutOfBoundsException {
-		if (index > this.size() || index < 0 || this.size() == 0)
-			throw new IndexOutOfBoundsException("Index: " + index
-					+ " is out of bounds");
+
+		if ( index < 0 || this.isEmpty())
+			throw new IndexOutOfBoundsException("The index provided is a negative value or the List is empty!");
 
 		return this.circularList[index];
 	}
@@ -144,7 +157,7 @@ public class CircularListArrayBased<E> implements CircularList<E> {
 
 			@Override
 			public void remove() {
-				throw new UnsupportedOperationException();
+				circularList.remove(index);
 			}
 
 		};
