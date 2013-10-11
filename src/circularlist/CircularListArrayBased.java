@@ -89,7 +89,7 @@ public class CircularListArrayBased<E> implements CircularList<E> {
 
 		E itemToRemove = this.get(index);
 
-		E[] newCircularList = (E[]) new Object[this.size() + 1];
+		E[] newCircularList = (E[]) new Object[this.size() - 1];
 
 		for (int i = 0; i < this.size(); i++) {
 			if (this.get(i) != itemToRemove)
@@ -99,7 +99,6 @@ public class CircularListArrayBased<E> implements CircularList<E> {
 		this.circularListSize = this.size() - 1;
 
 		return itemToRemove;
-
 	}
 
 	/**
