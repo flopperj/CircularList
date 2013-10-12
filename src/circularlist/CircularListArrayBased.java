@@ -94,22 +94,30 @@ public class CircularListArrayBased<E> implements CircularList<E> {
 	 * @return {E} the item that was removed
 	 * @throws IndexOutOfBoundsException if index is negative
 	 */
-	@SuppressWarnings("unchecked")
 	public E remove(int index) throws IndexOutOfBoundsException {
 
+		// Throw an exception if the index is negative
 		if (index < 0)
 			throw new IndexOutOfBoundsException("The index provided is a negative value!");
 		
+		// item to remove
 		E itemToRemove = this.get(index);
 
-		E[] newCircularList = (E[]) new Object[this.size() - 1];
+		// create a tempList
+		CircularList<E> tempList = new CircularListArrayBased<E>();
 
-		for (int i = 0; i < this.size(); i++) {
-			if (this.get(i) != itemToRemove)
-				newCircularList[i] = this.get(i);
+		// populate the tempList with all the items excluding the item we'll delete
+		for (E item : this) {
+			if (item != itemToRemove)
+				tempList.add(item);
 		}
-
-		this.circularListSize = this.size() - 1;
+		
+		// empty the current list
+		this.clear();
+		
+		// populate this list with the tempList's data
+		for (E item : tempList)
+			this.add(item);
 
 		return itemToRemove;
 	}
@@ -122,6 +130,7 @@ public class CircularListArrayBased<E> implements CircularList<E> {
 	 */
 	public E get(int index) throws IndexOutOfBoundsException {
 
+		// Throw an exception if the index is a negative value or the list is empty
 		if ( index < 0 || this.isEmpty())
 			throw new IndexOutOfBoundsException("The index provided is a negative value or the List is empty!");
 
